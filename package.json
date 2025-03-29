@@ -1,0 +1,70 @@
+{
+  "name": "fles-js",
+  "version": "0.0.1",
+  "description": "Modern, modular TypeScript framework for Node.js and Bun",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "fles": "dist/bin/cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsup",
+    "dev": "tsx watch src/bin/dev.ts",
+    "cli": "tsx src/bin/cli.ts",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"**/*.{ts,json}\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "framework",
+    "typescript",
+    "node",
+    "bun",
+    "http",
+    "server",
+    "api"
+  ],
+  "author": "Rafles Yohanes",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rfflsy16/fles-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rfflsy16/fles-js/issues"
+  },
+  "homepage": "https://github.com/rfflsy16/fles-js#readme",
+  "dependencies": {
+    "@types/node": "^22.13.14",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
+    "fs-extra": "^11.3.0",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/fs-extra": "^11.0.4",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.3"
+  },
+  "private": true,
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
