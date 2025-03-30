@@ -35,24 +35,218 @@ program
         // Create basic project structure
         const srcPath = path.join(projectPath, "src");
         fs.mkdirSync(srcPath);
+        fs.mkdirSync(path.join(srcPath, "modules"));
+        fs.mkdirSync(path.join(srcPath, "routes"));
 
         // Create basic app file
-        const appFilePath = path.join(srcPath, "app.ts");
+        const appFilePath = path.join(srcPath, "main.ts");
         fs.writeFileSync(
             appFilePath,
             `import { Fles } from "fles-js";
+import type { FlesRequest, FlesResponse } from "fles-js";
+import routes from "./routes/index.js";
 
-const app = new Fles();
+const fles = new Fles();
 
-// Define a simple route
-app.get("/", (req, res) => {
-    res.json({ message: "Hello from FLES.js!" });
+// Register API routes with /api prefix
+fles.use((req, res, next) => {
+    console.log(\`\${req.method} \${req.url}\`);
+    next();
 });
 
-// Start the server
-app.start(3000).then(() => {
-    console.log("Server running on http://localhost:3000");
+// Apply all routes
+routes(fles);
+
+// Start the server with the new run method
+fles.run(3000).then(() => {
+    console.log("🚀 Server running on http://localhost:3000");
 });
+`
+        );
+
+        // Create routes index file
+        const routesIndexPath = path.join(srcPath, "routes", "index.ts");
+        fs.writeFileSync(
+            routesIndexPath,
+            `import { Fles } from "fles-js";
+import userRoutes from "../modules/user/main.js";
+// Import other module routes here
+
+export default function routes(fles: Fles) {
+    // Register all module routes with /api prefix
+    fles.get("/api", (req, res) => {
+        res.json({ message: "Welcome to FLES.js API!" });
+    });
+    
+    // Register module routes
+    userRoutes(fles);
+    // Register other module routes here
+}
+`
+        );
+
+        // Create example module structure
+        const userModulePath = path.join(srcPath, "modules", "user");
+        fs.mkdirSync(userModulePath);
+
+        // Create user module files
+        const userMainPath = path.join(userModulePath, "main.ts");
+        fs.writeFileSync(
+            userMainPath,
+            `import { Fles } from "fles-js";
+import type { FlesRequest, FlesResponse } from "fles-js";
+import UserService from "./user.service.js";
+
+// User routes
+export default function userRoutes(fles: Fles) {
+    const userService = new UserService();
+
+    // API routes for user module
+    fles.get("/api/users", async (req: FlesRequest, res: FlesResponse) => {
+        const users = await userService.getAllUsers();
+        res.json(users);
+    });
+
+    fles.get("/api/users/:id", async (req: FlesRequest, res: FlesResponse) => {
+        const userId = req.params.id;
+        const user = await userService.getUserById(userId);
+        
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        
+        res.json(user);
+    });
+
+    fles.post("/api/users", async (req: FlesRequest, res: FlesResponse) => {
+        // Handle user creation
+        const newUser = await userService.createUser(req.body);
+        res.status(201).json(newUser);
+    });
+}
+`
+        );
+
+        // Create user service
+        const userServicePath = path.join(userModulePath, "user.service.ts");
+        fs.writeFileSync(
+            userServicePath,
+            `import UserRepository from "./user.repository.js";
+import { User } from "./user.types.js";
+
+class UserService {
+    private userRepository: UserRepository;
+
+    constructor() {
+        this.userRepository = new UserRepository();
+    }
+
+    async getAllUsers(): Promise<User[]> {
+        return this.userRepository.findAll();
+    }
+
+    async getUserById(id: string): Promise<User | null> {
+        return this.userRepository.findById(id);
+    }
+
+    async createUser(userData: Partial<User>): Promise<User> {
+        // Add validation logic here
+        return this.userRepository.create(userData as User);
+    }
+}
+
+export default UserService;
+`
+        );
+
+        // Create user repository
+        const userRepositoryPath = path.join(userModulePath, "user.repository.ts");
+        fs.writeFileSync(
+            userRepositoryPath,
+            `import { User } from "./user.types.js";
+
+// In a real app, this would connect to a database
+class UserRepository {
+    private users: User[] = [
+        { id: "1", name: "John Doe", email: "john@example.com" },
+        { id: "2", name: "Jane Smith", email: "jane@example.com" }
+    ];
+
+    async findAll(): Promise<User[]> {
+        return this.users;
+    }
+
+    async findById(id: string): Promise<User | null> {
+        const user = this.users.find(u => u.id === id);
+        return user || null;
+    }
+
+    async create(user: User): Promise<User> {
+        const newUser = { ...user, id: String(this.users.length + 1) };
+        this.users.push(newUser);
+        return newUser;
+    }
+}
+
+export default UserRepository;
+`
+        );
+
+        // Create user types
+        const userTypesPath = path.join(userModulePath, "user.types.ts");
+        fs.writeFileSync(
+            userTypesPath,
+            `export interface User {
+    id: string;
+    name: string;
+    email: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+`
+        );
+
+        // Create migration example
+        const userMigrationPath = path.join(userModulePath, "user.migration.ts");
+        fs.writeFileSync(
+            userMigrationPath,
+            `/*
+ * This is just an example of what a migration file might look like.
+ * In a real application, you would use a proper migration tool.
+ */
+
+export default {
+    up: \`
+        CREATE TABLE IF NOT EXISTS users (
+            id VARCHAR PRIMARY KEY,
+            name VARCHAR NOT NULL,
+            email VARCHAR NOT NULL UNIQUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    \`,
+    down: \`DROP TABLE IF EXISTS users\`
+};
+`
+        );
+
+        // Create seed example
+        const userSeedPath = path.join(userModulePath, "user.seed.ts");
+        fs.writeFileSync(
+            userSeedPath,
+            `/*
+ * This is just an example of what a seed file might look like.
+ * In a real application, you would use a proper seeding tool.
+ */
+
+export default {
+    seed: \`
+        INSERT INTO users (id, name, email)
+        VALUES 
+            ('1', 'John Doe', 'john@example.com'),
+            ('2', 'Jane Smith', 'jane@example.com')
+    \`
+};
 `
         );
 
@@ -61,11 +255,12 @@ app.start(3000).then(() => {
             name: projectName,
             version: "0.1.0",
             description: "A FLES.js project",
-            main: "dist/app.js",
+            type: "module",
+            main: "dist/main.js",
             scripts: {
                 dev: "fles dev",
                 build: "tsc",
-                start: "node dist/app.js",
+                start: "node dist/main.js",
             },
             dependencies: {
                 "fles-js": packageJson.version,

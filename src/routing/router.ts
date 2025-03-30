@@ -1,19 +1,12 @@
 import http from "http";
 import { parse as parseUrl } from "url";
 import { Logger } from "../utils/logger.js";
+import { FlesRequest, FlesResponse, FlesRequestHandler, FlesMiddleware } from "../types/index.js";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD";
 
-export type RequestHandler = (
-    req: http.IncomingMessage,
-    res: http.ServerResponse
-) => Promise<void> | void;
-
-export type Middleware = (
-    req: http.IncomingMessage,
-    res: http.ServerResponse,
-    next: () => Promise<void>
-) => Promise<void> | void;
+export type RequestHandler = FlesRequestHandler;
+export type Middleware = FlesMiddleware;
 
 interface Route {
     method: HttpMethod;
@@ -63,12 +56,28 @@ export class Router {
         const parsedUrl = parseUrl(req.url || "/");
         const path = parsedUrl.pathname || "/";
 
-        // Find matching route
-        const route = this.routes.find(
-            (r) => r.method === method && this.matchPath(r.path, path)
-        );
+        // Tambahkan query params
+        const flesReq = req as FlesRequest;
+        const query: Record<string, string> = {};
+        const searchParams = new URLSearchParams(parsedUrl.search || "");
+        searchParams.forEach((value, key) => {
+            query[key] = value;
+        });
+        flesReq.query = query;
 
-        if (!route) {
+        // Find matching route dengan path matching yg lebih canggih
+        let matchedRoute: Route | undefined;
+        for (const route of this.routes) {
+            if (route.method === method && this.matchPath(route.path, path)) {
+                matchedRoute = route;
+
+                // Extract route params dan tambahkan ke request
+                flesReq.params = this.extractParams(route.path, path);
+                break;
+            }
+        }
+
+        if (!matchedRoute) {
             res.statusCode = 404;
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify({ error: "Not Found" }));
@@ -84,14 +93,14 @@ export class Router {
         // Execute route handlers
         let currentHandlerIndex = 0;
         const executeNextHandler = async (): Promise<void> => {
-            if (currentHandlerIndex < route.handlers.length) {
-                const handler = route.handlers[currentHandlerIndex];
+            if (currentHandlerIndex < matchedRoute.handlers.length) {
+                const handler = matchedRoute.handlers[currentHandlerIndex];
                 currentHandlerIndex++;
 
                 if (this.isMiddleware(handler)) {
-                    await (handler as Middleware)(req, res, executeNextHandler);
+                    await (handler as Middleware)(req as FlesRequest, res as FlesResponse, executeNextHandler);
                 } else {
-                    await (handler as RequestHandler)(req, res);
+                    await (handler as RequestHandler)(req as FlesRequest, res as FlesResponse);
                 }
             }
         };
@@ -110,7 +119,7 @@ export class Router {
             if (currentIndex < middleware.length) {
                 const currentMiddleware = middleware[currentIndex];
                 currentIndex++;
-                await currentMiddleware(req, res, next);
+                await currentMiddleware(req as FlesRequest, res as FlesResponse, next);
             }
         };
 
@@ -124,8 +133,49 @@ export class Router {
     }
 
     private matchPath(routePath: string, requestPath: string): boolean {
-        // Simple path matching for now - will improve later
-        // This just checks for exact matches 
-        return routePath === requestPath;
+        // Jika path sama persis, langsung return true
+        if (routePath === requestPath) return true;
+
+        // Jika mengandung parameter dinamis, proses lebih lanjut
+        if (routePath.includes(":")) {
+            const routeParts = routePath.split("/");
+            const requestParts = requestPath.split("/");
+
+            // Panjang path harus sama
+            if (routeParts.length !== requestParts.length) return false;
+
+            // Periksa setiap bagian path
+            for (let i = 0; i < routeParts.length; i++) {
+                const routePart = routeParts[i];
+
+                // Jika ini parameter dinamis, cocok dan lanjutkan
+                if (routePart.startsWith(":")) continue;
+
+                // Jika bagian statis tidak cocok, return false
+                if (routePart !== requestParts[i]) return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private extractParams(routePath: string, requestPath: string): Record<string, string> {
+        const params: Record<string, string> = {};
+
+        const routeParts = routePath.split("/");
+        const requestParts = requestPath.split("/");
+
+        for (let i = 0; i < routeParts.length; i++) {
+            const routePart = routeParts[i];
+
+            if (routePart.startsWith(":")) {
+                const paramName = routePart.substring(1); // Hapus ':' dari awal
+                params[paramName] = requestParts[i];
+            }
+        }
+
+        return params;
     }
 } 

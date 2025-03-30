@@ -1,12 +1,13 @@
 {
-    "name": "example",
+    "name": "test1",
     "version": "0.1.0",
     "description": "A FLES.js project",
-    "main": "dist/app.js",
+    "type": "module",
+    "main": "dist/main.js",
     "scripts": {
         "dev": "fles dev",
         "build": "tsc",
-        "start": "node dist/app.js"
+        "start": "node dist/main.js"
     },
     "dependencies": {
         "fles-js": "0.0.1"

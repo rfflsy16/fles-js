@@ -8,13 +8,6 @@ export class Fles {
     constructor(config: ServerConfig = { port: 3000 }) {
         this.server = new Server(config);
         this.router = new Router();
-
-        // Register routes to server
-        this.server.registerRoutes((router) => {
-            // Copy routes from this.router to the server's router
-            // This will be implemented in the future
-            this.router = router;
-        });
     }
 
     // Express-like API for routing
@@ -44,16 +37,14 @@ export class Fles {
     }
 
     // Start the server
-    public async start(port?: number): Promise<void> {
+    public async run(port?: number): Promise<void> {
         if (port) {
             this.server = new Server({ port });
-            
-            // Re-register routes
-            this.server.registerRoutes((router) => {
-                this.router = router;
-            });
         }
-        
+
+        // Register routes ke server
+        this.server.registerRoutes(() => this.router);
+
         return this.server.start();
     }
 
@@ -65,5 +56,6 @@ export class Fles {
 
 // Export types and interfaces
 export { Router, HttpMethod, RequestHandler, Middleware } from "./routing/router.js";
+export { FlesRequest, FlesResponse } from "./types/index.js";
 export { ServerConfig } from "./core/server.js";
 export { Logger, LogLevel } from "./utils/logger.js";

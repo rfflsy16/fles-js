@@ -2,7 +2,7 @@ import http from "http";
 import { AddressInfo } from "net";
 import { Router } from "../routing/router.js";
 import { Logger } from "../utils/logger.js";
-
+import { FlesRequest, FlesResponse } from "../types/index.js";
 export interface ServerConfig {
     port: number;
     host?: string;
@@ -21,12 +21,37 @@ export class Server {
         this.router = new Router();
         this.logger = new Logger();
 
-        this.server = http.createServer(this.handleRequest.bind(this));
+        this.server = http.createServer((req, res) => this.handleRequest(req as FlesRequest, res as FlesResponse));
     }
 
     private async handleRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
         try {
-            await this.router.handle(req, res);
+            // Convert standard req/res to Fles types
+            const flesReq = req as FlesRequest;
+            const flesRes = res as FlesResponse;
+    
+            // Initialize Fles properties
+            flesReq.params = {};
+            flesReq.query = {};
+            flesReq.body = {};
+            
+            // Implement FlesResponse methods
+            flesRes.json = function(data: unknown): void {
+                this.setHeader("Content-Type", "application/json");
+                this.end(JSON.stringify(data));
+            };
+            
+            flesRes.send = function(text: string): void {
+                this.setHeader("Content-Type", "text/plain");
+                this.end(text);
+            };
+            
+            flesRes.status = function(code: number): FlesResponse {
+                this.statusCode = code;
+                return this;
+            };
+    
+            await this.router.handle(flesReq, flesRes);
         } catch (error) {
             this.logger.error("Server error", error);
             if (!res.headersSent) {
@@ -37,8 +62,8 @@ export class Server {
         }
     }
 
-    public registerRoutes(setupRoutes: (router: Router) => void): void {
-        setupRoutes(this.router);
+    public registerRoutes(getRouter: () => Router): void {
+        this.router = getRouter();
     }
 
     public async start(): Promise<void> {
