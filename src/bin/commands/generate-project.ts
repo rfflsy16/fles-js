@@ -144,7 +144,6 @@ dist
 	console.log("");
 	console.log(chalk.blue("Next steps:"));
 	console.log(`  cd ${projectName}`);
-	console.log(`  cd ${projectName}`);
 	console.log("  bun install");
 	console.log("  bun run dev");
 	console.log("");

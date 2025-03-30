@@ -3,7 +3,7 @@ export function createRoutesIndexTs(): string {
 import type { FlesRequest, FlesResponse } from "fles-js";
 
 // Create router instance
-const router = Router();
+const router = new Router();
 
 // Register API base route
 router.get("/api", (req: FlesRequest, res: FlesResponse) => {

@@ -218,7 +218,7 @@ import { ${moduleName} } from "./${moduleNameLower}.types.js";
 import ${moduleName}Service from "./${moduleNameLower}.service.js";
 
 // Create router instance
-const router = Router();
+const router = new Router();
 
 // Create an instance of the service
 const ${moduleNameLower}Service = new ${moduleName}Service();

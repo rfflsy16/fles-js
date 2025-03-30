@@ -7,7 +7,7 @@ const tsConfig = JSON.parse(tsConfigContent);
 const aliases = tsConfig.compilerOptions.paths;
 
 export default defineConfig({
-    entry: ['src/index.ts'],
+    entry: ['src/index.ts', 'src/bin/cli.ts'],
     format: ['esm'],
     dts: true,
     sourcemap: true,
