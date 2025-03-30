@@ -18,13 +18,50 @@ export class Router {
     private routes: Route[] = [];
     private globalMiddleware: Middleware[] = [];
     private logger: Logger;
+    [key: string]: any | ((path: string, ...handlers: Array<Middleware | RequestHandler>) => void);
 
     constructor() {
         this.logger = new Logger();
     }
 
-    public use(middleware: Middleware): void {
-        this.globalMiddleware.push(middleware);
+    public use(pathOrMiddleware: string | Middleware | ((app: Router) => void), ...handlers: Array<Middleware | RequestHandler>): void {
+        // Case 1: fles.use(middleware) - middleware global
+        if (typeof pathOrMiddleware === 'function' && pathOrMiddleware.length === 3) {
+            this.globalMiddleware.push(pathOrMiddleware as Middleware);
+            return;
+        }
+
+        // Case 2: fles.use(fn) - router function seperti di Express
+        if (typeof pathOrMiddleware === 'function' && pathOrMiddleware.length <= 1) {
+            (pathOrMiddleware as (app: Router) => void)(this);
+            return;
+        }
+
+        // Case 3: fles.use('/prefix', middleware1, middleware2) - middleware dengan prefix
+        if (typeof pathOrMiddleware === 'string' && handlers.length > 0) {
+            const prefix = pathOrMiddleware;
+
+            // Proses setiap handler
+            handlers.forEach(handler => {
+                if (this.isMiddleware(handler)) {
+                    // Gak diimplementasi full - hanya contoh
+                    this.addPrefixedMiddleware(prefix, handler as Middleware);
+                }
+            });
+        }
+    }
+
+    private addPrefixedMiddleware(prefix: string, middleware: Middleware): void {
+        const prefixedMiddleware: Middleware = async (req, res, next) => {
+            const path = req.url || '/';
+            if (path.startsWith(prefix)) {
+                await middleware(req, res, next);
+            } else {
+                await next();
+            }
+        };
+
+        this.globalMiddleware.push(prefixedMiddleware);
     }
 
     public get(path: string, ...handlers: Array<Middleware | RequestHandler>): void {
@@ -177,5 +214,38 @@ export class Router {
         }
 
         return params;
+    }
+
+    // Tambahan method baru untuk route prefix
+    public prefix(path: string): Router {
+        const prefixedRouter = new Router();
+
+        // Define methods with proper typing
+        prefixedRouter.get = (routePath: string, ...handlers: Array<Middleware | RequestHandler>) => {
+            this.get(`${path}${routePath}`, ...handlers);
+            return prefixedRouter;
+        };
+
+        prefixedRouter.post = (routePath: string, ...handlers: Array<Middleware | RequestHandler>) => {
+            this.post(`${path}${routePath}`, ...handlers);
+            return prefixedRouter;
+        };
+
+        prefixedRouter.put = (routePath: string, ...handlers: Array<Middleware | RequestHandler>) => {
+            this.put(`${path}${routePath}`, ...handlers);
+            return prefixedRouter;
+        };
+
+        prefixedRouter.delete = (routePath: string, ...handlers: Array<Middleware | RequestHandler>) => {
+            this.delete(`${path}${routePath}`, ...handlers);
+            return prefixedRouter;
+        };
+
+        prefixedRouter.patch = (routePath: string, ...handlers: Array<Middleware | RequestHandler>) => {
+            this.patch(`${path}${routePath}`, ...handlers);
+            return prefixedRouter;
+        };
+
+        return prefixedRouter;
     }
 } 

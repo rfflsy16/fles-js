@@ -31,9 +31,14 @@ export class Fles {
         this.router.patch(path, ...handlers);
     }
 
-    // Middleware registration
-    public use(middleware: Middleware): void {
-        this.router.use(middleware);
+    // Middleware registration (enhanced to support router functions)
+    public use(pathOrMiddleware: string | Middleware | ((app: Router) => void), ...handlers: Array<Middleware | RequestHandler>): void {
+        this.router.use(pathOrMiddleware, ...handlers);
+    }
+
+    // Router factory untuk create route dengan prefix
+    public createRouter(prefix: string = ''): Router {
+        return this.router.prefix(prefix);
     }
 
     // Start the server
@@ -54,8 +59,12 @@ export class Fles {
     }
 }
 
+// Export router factory method
+export const createRouter = (): Router => new Router();
+
 // Export types and interfaces
-export { Router, HttpMethod, RequestHandler, Middleware } from "./routing/router.js";
+export { HttpMethod, RequestHandler, Middleware } from "./routing/router.js";
 export { FlesRequest, FlesResponse } from "./types/index.js";
 export { ServerConfig } from "./core/server.js";
 export { Logger, LogLevel } from "./utils/logger.js";
+export { Router };
