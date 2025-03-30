@@ -108,9 +108,17 @@ export class Router {
 
         // Parse query parameters
         if (parsedUrl.query) {
-            const searchParams = new URLSearchParams(parsedUrl.query);
-            searchParams.forEach((value, key) => {
-                flesReq.query[key] = value;
+            // Gunakan metode yang berbeda untuk parsing query
+            const queryString = String(parsedUrl.query);
+            const entries = queryString.split('&').map(pair => {
+                const parts = pair.split('=');
+                const key = parts[0] ? decodeURIComponent(parts[0]) : '';
+                const value = parts[1] ? decodeURIComponent(parts[1]) : '';
+                return [key, value] as [string, string];
+            });
+
+            entries.forEach(([key, value]) => {
+                if (key) flesReq.query[key] = value;
             });
         }
 
@@ -162,9 +170,9 @@ export class Router {
                 const handler = matchedRoute!.handlers[currentHandlerIndex];
                 currentHandlerIndex++;
 
-                if (this.isMiddleware(handler)) {
+                if (handler && this.isMiddleware(handler)) {
                     await (handler as Middleware)(flesReq, flesRes, executeNextHandler);
-                } else {
+                } else if (handler) {
                     await (handler as RequestHandler)(flesReq, flesRes);
                 }
             }
@@ -185,7 +193,9 @@ export class Router {
             if (currentIndex < middleware.length) {
                 const currentMiddleware = middleware[currentIndex];
                 currentIndex++;
-                await currentMiddleware(req, res, next);
+                if (currentMiddleware) {
+                    await currentMiddleware(req, res, next);
+                }
             }
         };
 
@@ -217,7 +227,7 @@ export class Router {
                 const routePart = routeParts[i];
 
                 // Skip parameter segments
-                if (routePart.startsWith(":")) continue;
+                if (routePart && routePart.startsWith(":")) continue;
 
                 // Static segments must match
                 if (routePart !== requestParts[i]) return false;
@@ -238,10 +248,11 @@ export class Router {
 
         for (let i = 0; i < routeParts.length; i++) {
             const routePart = routeParts[i];
+            const requestPart = requestParts[i];
 
-            if (routePart.startsWith(":")) {
+            if (routePart && requestPart && routePart.startsWith(":")) {
                 const paramName = routePart.substring(1);
-                params[paramName] = requestParts[i];
+                params[paramName] = requestPart;
             }
         }
 

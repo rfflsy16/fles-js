@@ -1,9 +1,10 @@
-import { Server, type ServerConfig } from "./core/server.ts";
-import { Router, type HttpMethod, type RequestHandler, type Middleware } from "./routing/routes.ts";
+import { Server } from "@/core/server";
+import type { ServerConfig } from "@/types/fles-js";
+import { Router, type HttpMethod, type RequestHandler, type Middleware } from "@/routing/routes";
 
 export class Fles {
     private server: Server;
-    private router: Router; 
+    private router: Router;
 
     constructor(config: ServerConfig = { port: 3000 }) {
         this.server = new Server(config);
@@ -31,7 +32,7 @@ export class Fles {
         this.router.patch(path, ...handlers);
     }
 
-    // Middleware registration (enhanced to support router functions)
+    // Middleware registration
     public use(pathOrMiddleware: string | Middleware | ((app: Router) => void), ...handlers: Array<Middleware | RequestHandler>): void {
         this.router.use(pathOrMiddleware, ...handlers);
     }
@@ -63,7 +64,16 @@ export class Fles {
 export const createRouter = (): Router => new Router();
 
 // Export types and interfaces
-export { HttpMethod, RequestHandler, Middleware } from "./routing/routes.ts";
-export { FlesRequest, FlesResponse, ServerConfig, BaseEntity, BaseRepository, BaseService, Controller } from "./types/fles-js.d.ts";
-export { Logger, LogLevel } from "./utils/logger.ts";
-export { Router } from "./routing/routes.ts";
+export type { HttpMethod, RequestHandler, Middleware } from "@/routing/routes";
+export type {
+    FlesRequest,
+    FlesResponse,
+    ServerConfig,
+    BaseEntity,
+    BaseRepository,
+    BaseService,
+    Controller,
+    EnhancedServerResponse
+} from "@/types/fles-js";
+export { Logger, LogLevel } from "@/utils/logger";
+export { Router } from "@/routing/routes";

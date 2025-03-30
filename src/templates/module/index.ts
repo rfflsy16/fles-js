@@ -50,12 +50,12 @@ class ${moduleName}Repository implements BaseRepository<${moduleName}> {
    */
   async create(data: Omit<${moduleName}, 'id' | 'createdAt' | 'updatedAt'>): Promise<${moduleName}> {
     const now = new Date();
-    const new${moduleName} = { 
+    const new${moduleName}: ${moduleName} = { 
       ...data, 
       id: uuidv4(),
       createdAt: now,
       updatedAt: now
-    } as ${moduleName};
+    };
     
     this.${moduleNameLower}s.push(new${moduleName});
     return new${moduleName};
@@ -68,7 +68,7 @@ class ${moduleName}Repository implements BaseRepository<${moduleName}> {
     const index = this.${moduleNameLower}s.findIndex(item => item.id === id);
     if (index === -1) return null;
 
-    const updated${moduleName} = { 
+    const updated${moduleName}: ${moduleName} = { 
       ...this.${moduleNameLower}s[index], 
       ...data,
       updatedAt: new Date()
@@ -102,26 +102,26 @@ class ${moduleName}Repository implements BaseRepository<${moduleName}> {
    */
   private createSampleItem(idx: number): ${moduleName} {
     // Generate object data fields
-    const fieldsData: Partial<${moduleName}> = {};
+    const fieldsData: Record<string, unknown> = {};
     
     fields.filter(f => f.name !== 'id').forEach(field => {
       const fieldName = field.name;
       
       switch (field.type) {
         case 'string':
-          fieldsData[fieldName as keyof Partial<${moduleName}>] = \`Sample \${ fieldName } \${ idx } \` as any;
+          fieldsData[fieldName] = \`Sample \${ fieldName } \${ idx } \`;
           break;
         case 'number':
-          fieldsData[fieldName as keyof Partial<${moduleName}>] = idx * 10 as any;
+          fieldsData[fieldName] = idx * 10;
           break;
         case 'boolean':
-          fieldsData[fieldName as keyof Partial<${moduleName}>] = true as any;
+          fieldsData[fieldName] = true;
           break;
         case 'Date':
-          fieldsData[fieldName as keyof Partial<${moduleName}>] = new Date() as any;
+          fieldsData[fieldName] = new Date();
           break;
         default:
-          fieldsData[fieldName as keyof Partial<${moduleName}>] = \`Sample \${ fieldName } \${ idx } \` as any;
+          fieldsData[fieldName] = \`Sample \${ fieldName } \${ idx } \`;
       }
     });
     
@@ -214,6 +214,7 @@ export function createRoutes(moduleName: string, moduleNameLower: string, fields
     return `import { Router } from "fles-js";
 import type { FlesRequest, FlesResponse } from "fles-js";
 import { Controller } from "@/types/index.js";
+import { ${moduleName} } from "./${moduleNameLower}.types.js";
 import ${moduleName}Service from "./${moduleNameLower}.service.js";
 
 // Create router instance
@@ -259,7 +260,9 @@ const get${moduleName}ById: Controller = async (req: FlesRequest, res: FlesRespo
  */
 const create${moduleName}: Controller = async (req: FlesRequest, res: FlesResponse) => {
   try {
-    const new${moduleName} = await ${moduleNameLower}Service.create(req.body as Omit<${moduleName}, 'id' | 'createdAt' | 'updatedAt'>);
+    // Proper type assertion for request body
+    const data = req.body as Omit<${moduleName}, 'id' | 'createdAt' | 'updatedAt'>;
+    const new${moduleName} = await ${moduleNameLower}Service.create(data);
     res.status(201).json(new${moduleName});
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -273,7 +276,9 @@ const create${moduleName}: Controller = async (req: FlesRequest, res: FlesRespon
 const update${moduleName}: Controller = async (req: FlesRequest, res: FlesResponse) => {
   try {
     const id = req.params.id;
-    const updated${moduleName} = await ${moduleNameLower}Service.update(id, req.body as Partial<${moduleName}>);
+    // Proper type assertion for request body
+    const data = req.body as Partial<${moduleName}>;
+    const updated${moduleName} = await ${moduleNameLower}Service.update(id, data);
     
     if (!updated${moduleName}) {
       return res.status(404).json({ error: "${moduleName} not found" });

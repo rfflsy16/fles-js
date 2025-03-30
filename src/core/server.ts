@@ -1,8 +1,35 @@
 import { serve, type Server as BunServer } from "bun";
-import type { IncomingMessage, ServerResponse } from "http";
-import { Router } from "../routing/routes.ts";
-import { Logger } from "../utils/logger.js";
-import type { ServerConfig } from "../types/fles-js.d.ts";
+import { IncomingMessage, ServerResponse } from "http";
+import { Router } from "@/routing/routes";
+import { Logger } from "@/utils/logger";
+import type { ServerConfig, EnhancedServerResponse } from "@/types/fles-js";
+import { Socket } from "net";
+
+/**
+ * Bungkus semua dalam function untuk buat instances
+ * Menggunakan pendekatan prototype untuk menghindari error tipe tanpa any
+ */
+function createFlesRequest(): IncomingMessage {
+    // Buat objek socket dengan object create untuk melewati type checks
+    // tapi tetap menjaga properti prototype
+    const socket = new Socket();
+
+    // Buat IncomingMessage dengan parameter socket yang sudah dibuat
+    // Casting through unknown untuk menghindari error tipe
+    return Reflect.construct(IncomingMessage, [socket]) as IncomingMessage;
+}
+
+/**
+ * Membuat ServerResponse dengan pendekatan sama seperti createFlesRequest
+ */
+function createFlesResponse(): ServerResponse {
+    // Buat objek socket dengan object create untuk melewati type checks
+    const socket = new Socket();
+
+    // Buat ServerResponse dengan parameter socket
+    // Casting through unknown untuk menghindari error tipe
+    return Reflect.construct(ServerResponse, [socket]) as ServerResponse;
+}
 
 export class Server {
     private server: BunServer | null = null;
@@ -41,15 +68,17 @@ export class Server {
                     const res = this.createResponse();
 
                     // Use the router to handle the request
-                    await this.router.handle(req, res);
+                    // Unknown sebagai jembatan antara tipe yang tidak kompatibel
+                    await this.router.handle(req, res as unknown as ServerResponse);
 
                     return res.toBunResponse();
                 },
             });
 
             this.logger.info(`Server running at http://${this.config.hostname}:${this.config.port}`);
-        } catch (error) {
-            this.logger.error("Failed to start server", error);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.logger.error("Failed to start server", errorMessage);
             throw error;
         }
     }
@@ -64,67 +93,73 @@ export class Server {
 
     // Helper methods to convert between Bun and Node.js HTTP interfaces
     private convertBunRequest(request: Request): IncomingMessage {
-        // This is a simplified conversion - in a real implementation,
-        // you would need more comprehensive conversion logic
-        const req = new IncomingMessage(null as any);
+        const req = createFlesRequest();
         req.method = request.method;
         req.url = request.url;
 
         // Add headers from Bun Request
         request.headers.forEach((value, key) => {
-            req.headers[key.toLowerCase()] = value;
+            if (req.headers) {
+                req.headers[key.toLowerCase()] = value;
+            }
         });
 
         return req;
     }
 
-    private createResponse(): ServerResponse & {
-        toBunResponse: () => Response;
-    } {
-        const res = new ServerResponse(null as any);
+    private createResponse(): EnhancedServerResponse {
+        const res = createFlesResponse() as EnhancedServerResponse;
         const headers = new Headers();
         let statusCode = 200;
         let body: string | Uint8Array = "";
 
         // Override necessary methods
-        const originalSetHeader = res.setHeader;
-        res.setHeader = function (name: string, value: string | number | readonly string[]) {
-            headers.set(name, String(value));
-            return originalSetHeader.call(this, name, value);
-        };
+        const originalSetHeader = res.setHeader?.bind(res) ||
+            function () { return res; };
 
-        const originalEnd = res.end;
-        res.end = function (chunk?: string | Uint8Array) {
-            if (chunk) {
-                body = chunk;
-            }
-            originalEnd.call(this);
+        res.setHeader = function (name: string, value: string | number | readonly string[]): EnhancedServerResponse {
+            headers.set(name, String(value));
+            originalSetHeader(name, value);
             return this;
         };
 
-        const originalWriteHead = res.writeHead;
-        res.writeHead = function (statusCode: number) {
-            this.statusCode = statusCode;
-            return originalWriteHead.call(this, statusCode);
+        const originalEnd = res.end?.bind(res) ||
+            function () { return res; };
+
+        res.end = function (chunk?: string | Uint8Array): EnhancedServerResponse {
+            if (chunk) {
+                body = chunk;
+            }
+            originalEnd(chunk);
+            return this;
+        };
+
+        const originalWriteHead = res.writeHead?.bind(res) ||
+            function () { return res; };
+
+        res.writeHead = function (statusCode: number, ...args: unknown[]): EnhancedServerResponse {
+            res.statusCode = statusCode;
+            originalWriteHead(statusCode, ...args);
+            return this;
         };
 
         Object.defineProperty(res, 'statusCode', {
-            get() {
+            get(): number {
                 return statusCode;
             },
-            set(code: number) {
+            set(code: number): void {
                 statusCode = code;
             }
         });
 
         // Add toBunResponse method
-        res.toBunResponse = () => {
+        res.toBunResponse = (): Response => {
             return new Response(body, {
                 status: statusCode,
                 headers: headers
             });
         };
 
-        return res as any;
+        return res;
     }
 }

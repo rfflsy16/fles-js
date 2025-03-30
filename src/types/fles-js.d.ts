@@ -15,6 +15,14 @@ export interface FlesResponse extends ServerResponse {
     status(code: number): FlesResponse;
 }
 
+// Enhanced server response with Bun conversion
+export interface EnhancedServerResponse extends ServerResponse {
+    setHeader(name: string, value: string | number | readonly string[]): EnhancedServerResponse;
+    writeHead(statusCode: number, ...args: unknown[]): EnhancedServerResponse;
+    end(chunk?: string | Uint8Array): EnhancedServerResponse;
+    toBunResponse(): Response;
+}
+
 // Handler and Middleware types
 export type FlesRequestHandler = (
     req: FlesRequest,
