@@ -35,6 +35,9 @@ export type FlesMiddleware = (
     next: () => Promise<void>
 ) => Promise<void> | void;
 
+// Define NextFunction type
+export type NextFunction = () => Promise<void>;
+
 // Server Configuration
 export interface ServerConfig {
     port: number;

@@ -1,7 +1,7 @@
 import { parse as parseUrl } from "url";
 import type { IncomingMessage, ServerResponse } from "http";
 import { Logger } from "../utils/logger.js";
-import type { FlesRequest, FlesResponse, FlesRequestHandler, FlesMiddleware } from "../types/fles-js.d.ts";
+import type { FlesRequest, FlesResponse, FlesRequestHandler, FlesMiddleware, NextFunction } from "../types/fles-js.d.ts";
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD";
 
@@ -92,8 +92,26 @@ export class Router {
         this.routes.push({ method, path, handlers });
     }
 
+    // Tambahkan handler untuk middleware di Router
+    // Ini akan dipanggil secara otomatis oleh Fles.use()
+    public async handleAsMiddleware(req: FlesRequest, res: FlesResponse, next: NextFunction): Promise<void> {
+        try {
+            const handled = await this.handle(req, res);
+            if (!handled && !res.writableEnded) {
+                await next();
+            }
+        } catch (error) {
+            console.error("Router middleware error:", error);
+            if (!res.writableEnded) {
+                res.statusCode = 500;
+                res.setHeader("Content-Type", "application/json");
+                res.end(JSON.stringify({ error: "Internal Server Error" }));
+            }
+        }
+    }
+
     // Main request handler
-    public async handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    public async handle(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
         const method = req.method as HttpMethod;
         const parsedUrl = parseUrl(req.url || "/");
         const path = parsedUrl.pathname || "/";
@@ -151,17 +169,15 @@ export class Router {
         }
 
         if (!matchedRoute) {
-            res.statusCode = 404;
-            res.setHeader("Content-Type", "application/json");
-            res.end(JSON.stringify({ error: "Not Found" }));
-            return;
+            // Return false instead of sending 404
+            return false;
         }
 
         // Execute global middleware first
         await this.executeMiddleware(this.globalMiddleware, flesReq, flesRes);
 
         // If response already sent by middleware, return
-        if (res.writableEnded) return;
+        if (res.writableEnded) return true;
 
         // Execute route handlers
         let currentHandlerIndex = 0;
@@ -179,6 +195,9 @@ export class Router {
         };
 
         await executeNextHandler();
+
+        // Return true on successful handling
+        return true;
     }
 
     // Middleware executor
