@@ -1,6 +1,6 @@
 {
   "name": "fles-js",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Modern, type-safe TypeScript framework for Bun",
   "type": "module",
   "main": "dist/index.js",
