@@ -1,0 +1,14 @@
+{
+    "development": {
+        "uri": "mongodb://localhost:27017",
+        "name": "your_database_dev"
+    },
+    "test": {
+        "uri": "mongodb://localhost:27017",
+        "name": "your_database_test"
+    },
+    "production": {
+        "uri": "mongodb://localhost:27017",
+        "name": "your_database_prod"
+    }
+} 

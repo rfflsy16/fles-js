@@ -1,0 +1,14 @@
+{
+    "name": "create-fles-js",
+    "description": "🚀 Super fast MongoDB with GraphQL/REST API generator",
+    "template": {
+        "files": ["**/*"],
+        "gitignore": true,
+        "exclude": [
+            "node_modules",
+            ".git",
+            "dist",
+            "build"
+        ]
+    }
+}

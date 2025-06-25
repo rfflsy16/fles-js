@@ -1,0 +1,36 @@
+{
+  "name": "fles-js-cli",
+  "version": "1.3.92",
+  "description": "FLES-JS CLI - The Next-Gen Development Platform",
+  "type": "module",
+  "bin": {
+    "fles-js": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build ./src/index.js --outdir dist --target node",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "cli",
+    "mongodb",
+    "graphql",
+    "generator"
+  ],
+  "author": "Rafles Yohanes",
+  "license": "MIT",
+  "dependencies": {
+    "@henscc/mongajs": "^1.0.16",
+    "@henscc/mongoejs": "^1.0.15",
+    "chalk": "^5.4.1",
+    "commander": "^12.1.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^12.3.0"
+  },
+  "devDependencies": {
+    "glob": "^11.0.0",
+    "javascript-obfuscator": "^4.1.1"
+  }
+}

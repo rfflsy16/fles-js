@@ -1,0 +1,49 @@
+{
+  "name": "create-fles-js",
+  "version": "1.2.46",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "create-fles-js": "index.js"
+  },
+  "template": {
+    "name": "create-fles-js",
+    "description": "🚀 Super fast MongoDB with GraphQL/REST API generator"
+  },
+  "files": [
+    "template.json",
+    "template/**",
+    "index.js",
+    "commands/**"
+  ],
+  "trustedDependencies": [
+    "create-fles-js"
+  ],
+  "keywords": [
+    "mongodb",
+    "graphql",
+    "generator",
+    "api",
+    "cli",
+    "database",
+    "stack",
+    "fullstack",
+    "fles-js",
+    "fles-js-stack",
+    "fles-js-cli",
+    "rafles-yohanes",
+    "rafles-yohanes-code-ai",
+    "rafles-yohanes",
+    "raflescc"
+  ],
+  "author": {
+    "name": "Rafles Yohanes",
+    "email": "rfflsy16@gmail.com"
+  },
+  "license": "ISC",
+  "description": "🚀 Super fast MongoDB with GraphQL/REST API generator",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "prompts": "^2.4.2"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@henscc/mongoejs",
+  "version": "1.0.15",
+  "description": "MongoDB + Express REST API made easy! 🌐",
+  "type": "module",
+  "main": "src/index.js",
+  "files": [
+    "src",
+    "src/templates",
+    "src/templates/files"
+  ],
+  "keywords": [
+    "mongodb",
+    "express",
+    "rest",
+    "api",
+    "database"
+  ],
+  "author": "Hens MSN",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mongodb": "^6.12.0"
+  }
+}

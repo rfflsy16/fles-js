@@ -1,0 +1,27 @@
+{
+  "name": "fles-js-xroutes",
+  "version": "1.0.12",
+  "description": "To install dependencies:",
+  "license": "ISC",
+  "author": "Hens-MSN",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "bun-types": "^1.1.37",
+    "chokidar": "^4.0.3",
+    "express": "^4.21.2",
+    "typescript": "^5.7.2",
+    "undici-types": "^5.26.5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "module": "src/index.ts"
+}

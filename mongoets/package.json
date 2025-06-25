@@ -1,0 +1,22 @@
+{
+  "name": "@henscc/mongoets",
+  "version": "1.0.33",
+  "description": "MongoDB + Express + TypeScript API made easy! 📝",
+  "type": "module",
+  "main": "src/index.js",
+  "files": [
+    "src",
+    "src/templates",
+    "src/templates/files"
+  ],
+  "keywords": [
+    "mongodb",
+    "express",
+    "typescript",
+    "api",
+    "database",
+    "bun"
+  ],
+  "author": "Hens MSN",
+  "license": "MIT"
+}
