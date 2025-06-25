@@ -106,7 +106,6 @@ export async function initMongoejs(projectName = '.') {
             cwd: basePath
         })
 
-        // Try installing @henscc/mongoejs
         try {
             execSync('npm install @henscc/mongoejs', {
                 stdio: 'inherit',
