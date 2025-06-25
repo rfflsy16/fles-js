@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @type {Array<import('@henscc/mongajs').Seeder>}
+ * @type {Array<import('fles-mongo-express').Seeder>}
  */
 const seeders = [
     // {{seeders}}

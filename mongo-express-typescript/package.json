@@ -1,13 +1,14 @@
 {
-  "name": "@henscc/mongoets",
-  "version": "1.0.33",
+  "name": "fles-mongo-express-typescript",
+  "version": "1.0.34",
   "description": "MongoDB + Express + TypeScript API made easy! 📝",
   "type": "module",
   "main": "src/index.js",
   "files": [
     "src",
     "src/templates",
-    "src/templates/files"
+    "src/templates/files",
+    "src/templates/files/models"
   ],
   "keywords": [
     "mongodb",
@@ -17,6 +18,6 @@
     "database",
     "bun"
   ],
-  "author": "Hens MSN",
+  "author": "Rafles Yohanes",
   "license": "MIT"
 }

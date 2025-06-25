@@ -1,6 +1,6 @@
 import inquirer from 'inquirer'
 import fs from 'fs-extra'
-import { templates } from '@henscc/mongoejs'
+import { templates } from 'fles-mongo-express'
 import path from 'path'
 import { execSync } from 'child_process'
 import chalk from 'chalk'
@@ -107,14 +107,14 @@ export async function initMongoejs(projectName = '.') {
         })
 
         try {
-            execSync('npm install @henscc/mongoejs', {
+            execSync('npm install fles-mongo-express', {
                 stdio: 'inherit',
                 cwd: basePath
             })
         } catch (e) {
             // If not published yet, use npm link
-            console.log(chalk.yellow('\n⚠️ Using local @henscc/mongoejs...\n'))
-            execSync('npm link @henscc/mongoejs', {
+            console.log(chalk.yellow('\n⚠️ Using local fles-mongo-express...\n'))
+            execSync('npm link fles-mongo-express', {
                 stdio: 'inherit',
                 cwd: basePath
             })

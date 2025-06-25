@@ -1,0 +1,27 @@
+{
+  "name": "fles-mongo-apollo",
+  "version": "1.0.17",
+  "description": "MongoDB + Apollo GraphQL made easy! 🌐",
+  "type": "module",
+  "main": "src/index.js",
+  "files": [
+    "src",
+    "src/templates",
+    "src/templates/files",
+    "src/templates/files/models"
+  ],
+  "keywords": [
+    "mongodb",
+    "apollo",
+    "graphql",
+    "api",
+    "database"
+  ],
+  "author": "Rafles Yohanes",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server": "^3.13.0",
+    "graphql": "^16.8.1",
+    "mongodb": "^6.12.0"
+  }
+}

@@ -42,7 +42,7 @@ export async function init(projectName) {
             description: '🚀 Modern GraphQL API with MongoDB - Perfect for real-time apps',
             command: pkgManager === 'bun' ? 'bunx fles-js-cli mongajs init' : 'npx fles-js-cli mongajs init',
             available: true,
-            docs: 'https://github.com/fles-js-stack/mongajs'
+            docs: 'https://github.com/rfflsy16/fles-js'
         },
         'MongoDB + Express REST': {
             name: 'mongoejs',
@@ -91,7 +91,7 @@ export async function init(projectName) {
 ╔════════════════════════════════════════════════════════════════╗
 ║                                                                ║
 ║   🚀 Welcome to FLES-JS - The Next-Gen Development Platform     ║
-       ${chalk.yellow('With ❤️  from Hens MSN')}
+       ${chalk.yellow('With ❤️  from Rafles Yohanes')}
 ║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝
 

@@ -1,4 +1,4 @@
-import { Model } from '@henscc/mongoejs'
+import { Model } from 'fles-mongo-express'
 import { ObjectId } from 'mongodb'
 
 export class MODELNAME extends Model {

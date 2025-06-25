@@ -1,13 +1,14 @@
 {
-  "name": "@henscc/mongoejs",
-  "version": "1.0.15",
+  "name": "fles-mongo-express",
+  "version": "1.0.18",
   "description": "MongoDB + Express REST API made easy! 🌐",
   "type": "module",
   "main": "src/index.js",
   "files": [
     "src",
     "src/templates",
-    "src/templates/files"
+    "src/templates/files",
+    "src/templates/files/models"
   ],
   "keywords": [
     "mongodb",
@@ -16,7 +17,7 @@
     "api",
     "database"
   ],
-  "author": "Hens MSN",
+  "author": "Rafles Yohanes",
   "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",

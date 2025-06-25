@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import { templates } from '@henscc/mongajs'
+import { templates } from 'fles-mongo-apollo'
 import { showError, showInfo, showSuccess } from '../shared/messages.js'
 
 function convertToGraphQLType(type) {

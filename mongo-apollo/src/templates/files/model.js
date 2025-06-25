@@ -1,4 +1,4 @@
-import { Model } from '@henscc/mongajs'
+import { Model } from 'fles-mongo-apollo'
 import { ObjectId } from 'mongodb'
 
 export class MODELNAME extends Model {

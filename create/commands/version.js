@@ -34,9 +34,9 @@ function getPackageVersion(packageName) {
 }
 
 export function showVersion(pkg) {
-    const mongajsVersion = getPackageVersion('@henscc/mongajs')
-    const mongoejsVersion = getPackageVersion('@henscc/mongoejs')
-    const mongoetsVersion = getPackageVersion('@henscc/mongoets')
+    const mongajsVersion = getPackageVersion('fles-mongo-apollo')
+    const mongoejsVersion = getPackageVersion('fles-mongo-express')
+    const mongoetsVersion = getPackageVersion('fles-mongo-express-typescript')
 
     console.log(chalk.blue(`
 ╔════════════════════════════════════════════════════════════════╗
@@ -47,9 +47,9 @@ export function showVersion(pkg) {
 
 📦 create-fles-js  : v${pkg.version}
 🛠  fles-js-cli    : v${getCliVersion()}
-🔌 @henscc/mongajs : ${mongajsVersion}
-🌐 @henscc/mongoejs: ${mongoejsVersion}
-📝 @henscc/mongoets: ${mongoetsVersion}
+🔌 fles-mongo-apollo : ${mongajsVersion}
+🌐 fles-mongo-express: ${mongoejsVersion}
+📝 fles-mongo-express-typescript: ${mongoetsVersion}
 
 For more details, visit: ${chalk.underline('https://github.com/fles-js-stack/versions')}
 `))

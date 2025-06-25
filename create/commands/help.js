@@ -28,6 +28,6 @@ Available Frameworks:
     - MongoDB + Express + TS    (Coming Soon) ⏳
     - MongoDB + Next.js         (Coming Soon) ⏳
 
-For more details, visit: ${chalk.underline('https://github.com/fles-js-stack')}
+For more details, visit: ${chalk.underline('https://github.com/rfflsy16/fles-js')}
 `))
 } 

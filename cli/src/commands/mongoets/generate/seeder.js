@@ -9,7 +9,7 @@ const sampleValueMap = {
     'z.boolean()': () => Math.random() > 0.5,
     'z.date()': () => new Date().toISOString(),
     'z.array(z.string())': (field, i) => [`tag1-${i}`, `tag2-${i}`, `tag3-${i}`],
-    'z.string().email()': (field, i, isAuthUser) => 
+    'z.string().email()': (field, i, isAuthUser) =>
         isAuthUser ? `user${i + 1}@test.com` : `sample${i + 1}@example.com`,
     'z.string().url()': (field, i) => `https://example.com/sample-${i + 1}`,
 }
@@ -20,15 +20,15 @@ export async function generateSeederFile(name, fields, MODEL_PLURAL, MODEL_LC_PL
     await fs.ensureDir('./src/data')
 
     // Check if it's User model with auth fields
-    const isAuthUser = name === 'User' && 
-        Object.entries(fields).some(([name]) => name === 'email') && 
+    const isAuthUser = name === 'User' &&
+        Object.entries(fields).some(([name]) => name === 'email') &&
         Object.entries(fields).some(([name]) => name === 'password')
 
     showInfo(`Generating seeder for ${name}...`)
 
     // Generate model seeder
-    const seederContent = isAuthUser 
-        ? templates.userSeeder 
+    const seederContent = isAuthUser
+        ? templates.userSeeder
         : templates.modelSeeder
 
     await fs.writeFile(
@@ -45,7 +45,7 @@ export async function generateSeederFile(name, fields, MODEL_PLURAL, MODEL_LC_PL
         const data = {}
         Object.entries(fields).forEach(([field, type]) => {
             const generator = sampleValueMap[type]
-            data[field] = generator 
+            data[field] = generator
                 ? generator(field, i, isAuthUser)
                 : `Default ${field} value ${i + 1}`
         })
@@ -63,7 +63,7 @@ export async function generateSeederFile(name, fields, MODEL_PLURAL, MODEL_LC_PL
 
 async function updateSeederIndex(name, MODEL_PLURAL) {
     const indexPath = './src/seeders/index.ts'
-    
+
     if (!fs.existsSync(indexPath)) {
         const initialContent = templates.seederIndex
             .replace('{{IMPORTS}}', `import { seed${MODEL_PLURAL} } from "./${name.toLowerCase()}Seeder";`)
@@ -92,25 +92,25 @@ function updateCollections(content, MODEL_PLURAL) {
     if (!content.includes(`"${MODEL_PLURAL}"`)) {
         const collectionsStart = content.indexOf('const collections = [')
         const collectionsEnd = content.indexOf('];', collectionsStart)
-        
+
         let collections = content
             .slice(collectionsStart + 'const collections = ['.length, collectionsEnd)
             .split('\n')
             .filter(line => line.trim())
             .map(line => line.trim())
-        
+
         collections.push(`"${MODEL_PLURAL}"`)
-        
+
         const formattedCollections = collections
             .map(c => `            ${c}`)
             .join(',\n')
             .replace(/,+/g, ',')
-        
-        return content.slice(0, collectionsStart) + 
-               'const collections = [\n' +
-               formattedCollections + '\n' +
-               '        ]' +
-               content.slice(collectionsEnd + 1)
+
+        return content.slice(0, collectionsStart) +
+            'const collections = [\n' +
+            formattedCollections + '\n' +
+            '        ]' +
+            content.slice(collectionsEnd + 1)
     }
     return content
 }
@@ -119,25 +119,25 @@ function updateSeeders(content, MODEL_PLURAL) {
     if (!content.includes(`seed${MODEL_PLURAL}()`)) {
         const promiseStart = content.indexOf('await Promise.all([')
         const promiseEnd = content.indexOf(']);', promiseStart)
-        
+
         let seeders = content
             .slice(promiseStart + 'await Promise.all(['.length, promiseEnd)
             .split('\n')
             .filter(line => line.trim())
             .map(line => line.trim())
-        
+
         seeders.push(`seed${MODEL_PLURAL}()`)
-        
+
         const formattedSeeders = seeders
             .map(s => `            ${s}`)
             .join(',\n')
             .replace(/,+/g, ',')
-        
-        return content.slice(0, promiseStart) + 
-               'await Promise.all([\n' +
-               formattedSeeders + '\n' +
-               '        ]' +
-               content.slice(promiseEnd + 1)
+
+        return content.slice(0, promiseStart) +
+            'await Promise.all([\n' +
+            formattedSeeders + '\n' +
+            '        ]' +
+            content.slice(promiseEnd + 1)
     }
     return content
 } 

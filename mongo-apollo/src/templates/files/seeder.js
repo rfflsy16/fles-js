@@ -4,7 +4,7 @@ import { MODELNAME } from '../models/index.js'
 import fs from 'fs/promises'
 import { ObjectId } from 'mongodb'
 
-/** @type {import('@henscc/mongoejs').Seeder} */
+/** @type {import('fles-mongo-apollo').Seeder} */
 export default {
     /**
      * @param {import('mongodb').Db} db - MongoDB database instance

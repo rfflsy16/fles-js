@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import { templates } from '@henscc/mongoejs'
+import { templates } from 'fles-mongo-express'
 import chalk from 'chalk'
 import { showError, showInfo, showSuccess } from '../shared/messages.js'
 

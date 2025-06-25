@@ -29,12 +29,10 @@
     "stack",
     "fullstack",
     "fles-js",
-    "fles-js-stack",
     "fles-js-cli",
     "rafles-yohanes",
     "rafles-yohanes-code-ai",
-    "rafles-yohanes",
-    "raflescc"
+    "rafles-yohanes"
   ],
   "author": {
     "name": "Rafles Yohanes",

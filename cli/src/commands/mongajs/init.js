@@ -1,6 +1,6 @@
 import inquirer from 'inquirer'
 import fs from 'fs-extra'
-import { templates } from '@henscc/mongajs'
+import { templates } from 'fles-mongo-apollo'
 import path from 'path'
 import { execSync } from 'child_process'
 import chalk from 'chalk'
@@ -85,7 +85,7 @@ export async function initMongajs(projectName = '.') {
 
     // Install dependencies
     console.log(chalk.blue('\n📥 Installing dependencies...\n'))
-    execSync('npm install @henscc/mongajs mongodb @apollo/server graphql dotenv', {
+    execSync('npm install fles-mongo-apollo mongodb @apollo/server graphql dotenv', {
         stdio: 'inherit',
         cwd: basePath
     })
