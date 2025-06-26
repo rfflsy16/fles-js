@@ -1,6 +1,6 @@
 {
   "name": "create-fles-js",
-  "version": "1.2.46",
+  "version": "1.2.48",
   "main": "index.js",
   "type": "module",
   "bin": {
