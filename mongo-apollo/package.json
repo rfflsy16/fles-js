@@ -1,6 +1,6 @@
 {
   "name": "fles-mongo-apollo",
-  "version": "1.0.17",
+  "version": "2.0.1",
   "description": "MongoDB + Apollo GraphQL made easy! 🌐",
   "type": "module",
   "main": "src/index.js",

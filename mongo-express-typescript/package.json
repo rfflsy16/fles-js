@@ -1,6 +1,6 @@
 {
   "name": "fles-mongo-express-typescript",
-  "version": "1.0.34",
+  "version": "2.0.1",
   "description": "MongoDB + Express + TypeScript API made easy! 📝",
   "type": "module",
   "main": "src/index.js",

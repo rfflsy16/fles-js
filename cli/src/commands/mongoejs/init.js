@@ -50,7 +50,7 @@ export async function initMongoejs(projectName = '.') {
 
     // Create project structure
     const basePath = projectName === '.' ? '.' : projectName
-    
+
     console.log(chalk.blue('\n📦 Creating project structure...\n'))
 
     await fs.ensureDir(basePath)
@@ -64,10 +64,37 @@ export async function initMongoejs(projectName = '.') {
 
     // Initialize package.json
     console.log(chalk.blue('📝 Initializing package.json...'))
-    execSync('npm init -y', { 
+    execSync('npm init -y', {
         stdio: 'inherit',
-        cwd: basePath 
+        cwd: basePath
     })
+
+    // Install dependencies
+    console.log(chalk.blue('\n📥 Installing dependencies...\n'))
+    try {
+        // Install other deps first
+        execSync('npm install mongodb express cors dotenv', {
+            stdio: 'inherit',
+            cwd: basePath
+        })
+
+        try {
+            execSync('npm install fles-mongo-express', {
+                stdio: 'inherit',
+                cwd: basePath
+            })
+        } catch (e) {
+            // If not published yet, use npm link
+            console.log(chalk.yellow('\n⚠️ Using local fles-mongo-express...\n'))
+            execSync('npm link fles-mongo-express', {
+                stdio: 'inherit',
+                cwd: basePath
+            })
+        }
+    } catch (error) {
+        console.error(chalk.red('\n❌ Error installing dependencies:', error.message))
+        process.exit(1)
+    }
 
     // Write files
     await fs.writeFile(
@@ -97,32 +124,7 @@ export async function initMongoejs(projectName = '.') {
         templates.rootIndex
     )
 
-    // Install dependencies
-    console.log(chalk.blue('\n📥 Installing dependencies...\n'))
-    try {
-        // Install other deps first
-        execSync('npm install mongodb express cors dotenv', {
-            stdio: 'inherit',
-            cwd: basePath
-        })
 
-        try {
-            execSync('npm install fles-mongo-express', {
-                stdio: 'inherit',
-                cwd: basePath
-            })
-        } catch (e) {
-            // If not published yet, use npm link
-            console.log(chalk.yellow('\n⚠️ Using local fles-mongo-express...\n'))
-            execSync('npm link fles-mongo-express', {
-                stdio: 'inherit',
-                cwd: basePath
-            })
-        }
-    } catch (error) {
-        console.error(chalk.red('\n❌ Error installing dependencies:', error.message))
-        process.exit(1)
-    }
 
     // Update package.json scripts
     const pkgPath = path.join(basePath, 'package.json')
@@ -141,26 +143,26 @@ export async function initMongoejs(projectName = '.') {
 
     console.log(`
 📁 ${chalk.bold.blueBright(projectDir)}/
-  ${chalk.magenta('├─')} ${chalk.cyan('models/')}
-  ${chalk.magenta('├─')} ${chalk.cyan('controllers/')}
-  ${chalk.magenta('├─')} ${chalk.cyan('routers/')}
-  ${chalk.magenta('├─')} ${chalk.cyan('middlewares/')}
-  ${chalk.magenta('├─')} ${chalk.cyan('config/')}
-  ${chalk.magenta('│  └─')} ${chalk.cyan('mongodb.json')} ${chalk.gray(`(${config.development.name})`)}
-  ${chalk.magenta('├─')} ${chalk.cyan('seeders/')}
-  ${chalk.magenta('└─')} ${chalk.cyan('data/')}
+    ${chalk.magenta('├─')} ${chalk.cyan('models/')}
+    ${chalk.magenta('├─')} ${chalk.cyan('controllers/')}
+    ${chalk.magenta('├─')} ${chalk.cyan('routers/')}
+    ${chalk.magenta('├─')} ${chalk.cyan('middlewares/')}
+    ${chalk.magenta('├─')} ${chalk.cyan('config/')}
+    ${chalk.magenta('│  └─')} ${chalk.cyan('mongodb.json')} ${chalk.gray(`(${config.development.name})`)}
+    ${chalk.magenta('├─')} ${chalk.cyan('seeders/')}
+    ${chalk.magenta('└─')} ${chalk.cyan('data/')}
 `)
 
     console.log(`
 ${chalk.bold.greenBright('🚀 Next steps:')}
-  ${chalk.yellowBright(`cd ${projectName !== '.' ? projectName : ''}`)}
-  ${chalk.yellowBright('npm run dev')}
+    ${chalk.yellowBright(`cd ${projectName !== '.' ? projectName : ''}`)}
+    ${chalk.yellowBright('npm run dev')}
 `)
 
     console.log(`
 ${chalk.bold.greenBright('💾 Database Commands:')}
-  ${chalk.yellowBright('npm run seed')}      ${chalk.gray('# Reset & seed database')}
-  ${chalk.yellowBright('npm run seed:up')}   ${chalk.gray('# Only seed database')}
-  ${chalk.yellowBright('npm run seed:down')} ${chalk.gray('# Only clear database')}
+    ${chalk.yellowBright('npm run seed')}      ${chalk.gray('# Reset & seed database')}
+    ${chalk.yellowBright('npm run seed:up')}   ${chalk.gray('# Only seed database')}
+    ${chalk.yellowBright('npm run seed:down')} ${chalk.gray('# Only clear database')}
     `)
 }

@@ -1,6 +1,6 @@
 {
   "name": "fles-mongo-express",
-  "version": "1.0.18",
+  "version": "2.0.1",
   "description": "MongoDB + Express REST API made easy! 🌐",
   "type": "module",
   "main": "src/index.js",

@@ -1,18 +1,18 @@
 {
   "name": "fles-js-cli",
-  "version": "1.3.96",
+  "version": "3.0.3",
   "description": "FLES-JS CLI - The Next-Gen Development Platform",
   "type": "module",
   "bin": {
-    "fles-js": "dist/index.js"
+    "fles-js": "dist"
   },
   "files": [
     "dist",
-    "dist/files"
+    "src/templates",
+    "src/templates/files"
   ],
   "scripts": {
     "build": "bun build ./src/index.js --outdir dist --target node",
-    "copy-files": "mkdir -p dist/files/models && cp -r src/providers/mongoets/templates/files/* dist/files/",
     "prepublishOnly": "bun run build"
   },
   "keywords": [
